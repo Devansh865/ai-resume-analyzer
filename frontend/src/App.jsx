@@ -38,7 +38,7 @@ function App() {
       formData.append('yoe', 0);
 
       // Connect to the backend
-      const response = await fetch('http://127.0.0.1:8000/upload', {
+      const response = await fetch('https://ai-resume-analyzer-b84o.onrender.com', {
         method: 'POST',
         body: formData,
       });
