@@ -3,6 +3,5 @@ uvicorn
 python-multipart
 pdfplumber
 google-genai
-sentence-transformers
 scikit-learn
 python-dotenv
