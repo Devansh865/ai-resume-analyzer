@@ -6,15 +6,13 @@ import re
 import os
 import json
 from google import genai
-from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv
 
 app = FastAPI()
 
 # Load the SentenceTransformer model globally for fast semantic similarity computation
-# all-MiniLM-L6-v2 is a lightweight and performant model for sentence embeddings
-semantic_model = SentenceTransformer('all-MiniLM-L6-v2')
 
 app.add_middleware(
     CORSMiddleware,
@@ -206,15 +204,12 @@ async def upload_resume(
     # Compute Semantic Similarity Match Score using Machine Learning
     match_score = 0
     if jobDescription.strip() and text.strip():
-        # 1. Convert resume text and job description into dense vector embeddings
-        resume_embedding = semantic_model.encode([text])
-        jd_embedding = semantic_model.encode([jobDescription])
-        
-        # 2. Compute cosine similarity between the two embeddings (vector arrays)
-        similarity = cosine_similarity(resume_embedding, jd_embedding)[0][0]
-        
-        # 3. Scale similarity to 0-100 match_score
-        match_score = max(0, int(similarity * 100))
+        vectorizer = TfidfVectorizer()
+
+        vectors = vectorizer.fit_transform([text, jobDescription])
+        similarity = cosine_similarity(vectors[0:1], vectors[1:2])[0][0]
+
+        match_score = int(similarity * 100)
     
     final_score = base_score
     if jobDescription.strip():
